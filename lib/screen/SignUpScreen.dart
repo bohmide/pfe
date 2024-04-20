@@ -13,8 +13,6 @@ import 'package:hand_tracking/services/backend.dart';
 import 'package:hand_tracking/utils/Size.dart';
 import 'package:hand_tracking/widgets/comun/Button.dart';
 import 'package:hand_tracking/widgets/comun/MyTextField.dart';
-import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -24,8 +22,6 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  Client client = http.Client();
-
   final TextEditingController _controllerFirstName = TextEditingController();
   final TextEditingController _controllerLastName = TextEditingController();
   final TextEditingController _controllerEmail = TextEditingController();
@@ -33,7 +29,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _controllerVerifPassword =
       TextEditingController();
 
-  final bool _isloading = false;
+  bool _isloading = false;
 
   bool _firstNameError = false;
   bool _lastNameError = false;
@@ -103,11 +99,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
               const SizedBox(
                 height: 64,
               ),
-              otherMethodeText(),
+              /*otherMethodeText(),
               const SizedBox(
                 height: 32,
               ),
-              otherMethodeButton(),
+              otherMethodeButton(),*/
               const SizedBox(
                 height: 32,
               ),
@@ -124,51 +120,85 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Widget logo() {
     return SizedBox(
-      height: getHeight(context) / 8,
-      width: double.infinity,
-      child: const Center(
-        child: Text(
-          "LOGO",
-          style: TextStyle(
-              fontFamily: "inter",
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: MyColors.primarytextColor),
-        ),
+      height: getHeight(context) / 3,
+      width: getWidth(context)/1.5,
+      child: Center(
+        child:
+          Padding(
+            padding: const EdgeInsets.only(
+              top : 32,
+              bottom: 16,
+            ),
+            child: SvgPicture.asset('assets/logos/logo.svg'),
+          )
+
       ),
     );
   }
 
   Widget signUpButton() {
     return buttonNavigation2(context, 0, _isloading, () async {
-      if (!verifEmpty()) {
-        await registerRequest(
-                _controllerFirstName.text,
-                _controllerLastName.text,
-                _controllerEmail.text,
-                _controllerPassword.text)
-            .then((value) {
-          if (value.statusCode == 200) {
-            log((value.body.toString()));
-          } else {
-            var body = jsonDecode(value.body);
-            if (body.toString().contains('email')) {
-              setState(() {
-                _emailError = true;
-                _emailErrorText = body["email"]
-                    .toString()
-                    .substring(1, body["email"].toString().length - 2);
-              });
+
+      setState(() {
+        _isloading = true;
+      });
+      int serverStat = await checkSever();
+
+      log("server stat : $serverStat");
+
+      if (serverStat == 1) {
+
+        setState(() {
+        _isloading = false;
+      });
+        showDialog(
+            context: context,
+            builder: (_) {
+              return AlertDialog(
+                title: const Text("Check Server"),
+                actions: [
+                  buttonNavigation2(
+                      context,
+                      0,
+                      false,
+                      () => Navigator.pop(context),
+                      "ok",
+                      16.0,
+                      32.0,
+                      64.0,
+                      MyColors.primaryColor,
+                      Colors.white)
+                ],
+              );
+            });
+      } else {
+        if (!verifEmpty()) {
+          await registerRequest(
+                  _controllerFirstName.text,
+                  _controllerLastName.text,
+                  _controllerEmail.text,
+                  _controllerPassword.text)
+              .then((value) {
+            if (value.statusCode == 200) {
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const CameraScreen()),
+                  (route) => false);
+            } else {
+              var body = jsonDecode(value.body);
+              if (body.toString().contains('email')) {
+                setState(() {
+                  _emailError = true;
+                  _emailErrorText = body["email"]
+                      .toString()
+                      .substring(1, body["email"].toString().length - 2);
+                });
+              }
             }
-          }
-        }).onError((error, stackTrace) {
-          log(('Error: ${error.toString()}'));
-        });
-        //viewRequest();
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const CameraScreen()),
-          (route) => false);
+          }).onError((error, stackTrace) {
+            log(('Error: ${error.toString()}'));
+          });
+        }
       }
     }, 'Sign Up', 14, getHeight(context) / 15, null, MyColors.primaryColor,
         MyColors.secondarytextColor);

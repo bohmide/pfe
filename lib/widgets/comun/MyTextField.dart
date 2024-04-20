@@ -1,5 +1,5 @@
 // ignore_for_file: must_be_immutable
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hand_tracking/contant/MyColors.dart';
 
@@ -17,6 +17,9 @@ class MyTextField extends StatefulWidget {
 }
 
 class _MyTextFieldState extends State<MyTextField> {
+
+  String tt = "pwd";
+
   BoxDecoration containertextfieldDecoration() {
     return const BoxDecoration(
       borderRadius: BorderRadius.all(Radius.circular(8)),
@@ -34,6 +37,24 @@ class _MyTextFieldState extends State<MyTextField> {
 
   InputDecoration textfieldDecoration(context, String hintText) {
     return InputDecoration(
+        suffixIcon: widget.hintText!.contains("password")
+        ?IconButton(
+            onPressed: () {
+              setState(() {
+                if(tt == widget.keybordStyle){
+                  tt = "show_pwd";
+                }else{
+                  tt = "pwd";
+                }
+              });
+            },
+            icon: Icon(
+              tt == widget.keybordStyle
+              ?CupertinoIcons.eye: 
+              tt == "show_pwd"
+              ?CupertinoIcons.eye_slash
+              :null))
+              : null,
         contentPadding: const EdgeInsets.only(top: 12, bottom: 12, left: 14),
         hintText: hintText,
         hintStyle: const TextStyle(fontSize: 14),
@@ -47,9 +68,10 @@ class _MyTextFieldState extends State<MyTextField> {
       //width: getWidth(context) / 1.3,
       decoration: containertextfieldDecoration(),
       child: TextField(
-        obscureText: widget.keybordStyle == "pwd",
-        textInputAction:
-            widget.inputAction == 0 ? TextInputAction.next : TextInputAction.done,
+        obscureText: tt == widget.keybordStyle,
+        textInputAction: widget.inputAction == 0
+            ? TextInputAction.next
+            : TextInputAction.done,
         keyboardType: widget.keybordStyle == "email"
             ? TextInputType.emailAddress
             : widget.keybordStyle == "pwd"

@@ -6,7 +6,7 @@ class User{
   String firstName;
   String lastName;
   String email;
-  String password;
+  String token;
 
 
   User.fromJson(Map<String, dynamic> json) :
@@ -14,7 +14,7 @@ class User{
     firstName =  json['first_name'],
     lastName =  json['last_name'],
     email =  json['email'],
-    password =  json['password'];
+    token =  json['token'];
   
 
   Map<String, dynamic> toJson(){
@@ -23,7 +23,7 @@ class User{
     'first_name' : firstName,
     'last_name' : lastName,
     'email' : email,
-    'password' : password,
+    'token' : token,
     };
   }
 }

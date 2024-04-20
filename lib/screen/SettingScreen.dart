@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:hand_tracking/model/User.dart';
+import 'package:hand_tracking/screen/AboutUsScreen.dart';
+import 'package:hand_tracking/widgets/comun/topAppBar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_advanced_switch/flutter_advanced_switch.dart';
@@ -40,6 +43,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final TextEditingController _controllerPassword = TextEditingController();
   final TextEditingController _controllerNewPassword = TextEditingController();
 
+  late User user;
+
+  @override
+  void initState() {
+    super.initState();
+    initUser();
+  }
+
+  Future<void> initUser() async {
+    
+    User? fetchedUser = await getUser();
+    if(fetchedUser == null){
+      log("user null");
+    }else{
+      setState(() {
+        user = fetchedUser;
+      });
+    }
+
+  }
+
+  Future<User?> getUser() async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    String? dataUser = pref.getString("user");
+
+    if(dataUser == null){
+      return null;
+    }else{
+      return User.fromJson(jsonDecode(dataUser));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -48,16 +83,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            topAppbar(),
+            topAppbar(context),
             avaterPec(),
             const SizedBox(
               height: 32,
             ),
             space(personalInfo(), password()),
-            const SizedBox(
+            /*const SizedBox(
               height: 14,
             ),
-            space(notifcationWidget(), themeWidget()),
+            space(notifcationWidget(), themeWidget()),*/
             const SizedBox(
               height: 14,
             ),
@@ -68,17 +103,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     ));
   }
 
-  Widget topAppbar() {
-    return SizedBox(
-      height: 64,
-      width: getWidth(context),
-      child: Align(
-          alignment: Alignment.centerLeft,
-          child: IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.arrow_back_ios))),
-    );
-  }
 
   Widget avaterPec() {
     return ClipOval(
@@ -118,10 +142,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget personalInfo() {
     return GestureDetector(
       onTap: () {
-        viewRequest();
+        initUser();
+        log("${user.firstName}");
         setState(() {
           personalButton = !personalButton;
           if (personalButton) {
+            notifButton = false;
+            pswdButton = false;
+            themeButton = false;
             _controllerFirstName.text = '';
             _firstNameError = true;
             _controllerLastName.text = '';
@@ -133,24 +161,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           Row(
             children: [
-              iconImage(Icons.person_2),
+              iconImage(CupertinoIcons.person),
               const Expanded(flex: 6, child: Text("Personal info")),
               Expanded(
                   flex: 1,
-                  child: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          personalButton = !personalButton;
-                          if (personalButton) {
-                            notifButton = false;
-                            pswdButton = false;
-                            themeButton = false;
-                          }
-                        });
-                      },
-                      icon: personalButton
-                          ? const Icon(Icons.arrow_drop_up)
-                          : const Icon(Icons.arrow_drop_down)))
+                  child: Icon(
+                       (personalButton
+                          ?  CupertinoIcons.arrow_up_circle
+                          :  CupertinoIcons.arrow_down_circle)))
             ],
           ),
           if (personalButton) modifyName(),
@@ -181,7 +199,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     SizedBox(
                         height: 32,
                         width: getWidth(context),
-                        child: MyTextField("first name", 0, null,
+                        child: MyTextField(user.firstName, 0, null,
                             textEditingController: _controllerFirstName)),
                     if (!_firstNameError) textErrorWidget(_firstNameText)
                   ],
@@ -194,7 +212,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     SizedBox(
                         height: 32,
                         width: getWidth(context),
-                        child: MyTextField("last name", 1, null,
+                        child: MyTextField(user.lastName, 1, null,
                             textEditingController: _controllerLastName)),
                     if (!_lastNameError) textErrorWidget(_lastNameText)
                   ],
@@ -209,9 +227,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
               alignment: Alignment.centerRight,
               child: buttonSubmit("OK", () async {
                 if (verifName()) {
+                  viewRequest();
                   int statueRequest = await changeNameRequest(
                       _controllerFirstName.text, _controllerLastName.text);
-                  log("with statue: ${statueRequest.toString()}");
+                   if(statueRequest == 0){
+                    SharedPreferences pref = await SharedPreferences.getInstance();
+                    String? dataUser = pref.getString('user');
+                    if(dataUser == null){
+                      log("User Not Found");
+                    }else{
+                              initUser();
+
+                    }
+                   }
                 }
               }))
         ],
@@ -260,7 +288,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _newPwdError = true;
       }
     });
-    log('pwd : $_pwdError// new : $_newPwdError // && : ${_pwdError && _newPwdError}');
     return _pwdError && _newPwdError;
   }
 
@@ -270,6 +297,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         setState(() {
           pswdButton = !pswdButton;
           if (pswdButton) {
+            personalButton = false;
+            notifButton = false;
+            themeButton = false;
             _controllerPassword.text = '';
             _pwdError = true;
             _controllerNewPassword.text = '';
@@ -281,24 +311,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           Row(
             children: [
-              iconImage(Icons.password),
+              iconImage(CupertinoIcons.lock),
               const Expanded(flex: 6, child: Text("Password")),
               Expanded(
                   flex: 1,
-                  child: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          pswdButton = !pswdButton;
-                          if (pswdButton) {
-                            personalButton = false;
-                            notifButton = false;
-                            themeButton = false;
-                          }
-                        });
-                      },
-                      icon: pswdButton
-                          ? const Icon(Icons.arrow_drop_up)
-                          : const Icon(Icons.arrow_drop_down)))
+                  child: Icon(
+                       (pswdButton
+                          ?  CupertinoIcons.arrow_up_circle
+                          :  CupertinoIcons.arrow_down_circle)))
             ],
           ),
           if (pswdButton) modifyPswd()
@@ -360,16 +380,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void getUser() async {
-    final SharedPreferences pref = await SharedPreferences.getInstance();
-
-    var token = pref.getString('token');
-
-    Map<String, dynamic> user = JwtDecoder.decode(token!);
-
-    log(user.toString());
-  }
-
   // notification
 
   Widget notifcationWidget() {
@@ -377,30 +387,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
       onTap: () {
         setState(() {
           notifButton = !notifButton;
+          if (notifButton) {
+            personalButton = false;
+            pswdButton = false;
+            themeButton = false;
+          }
         });
       },
       child: Column(
         children: [
           Row(
             children: [
-              iconImage(Icons.notifications),
+              iconImage(CupertinoIcons.bell),
               const Expanded(flex: 6, child: Text("Notiffication")),
               Expanded(
                   flex: 1,
-                  child: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          notifButton = !notifButton;
-                          if (notifButton) {
-                            personalButton = false;
-                            pswdButton = false;
-                            themeButton = false;
-                          }
-                        });
-                      },
-                      icon: notifButton
-                          ? const Icon(Icons.arrow_drop_up)
-                          : const Icon(Icons.arrow_drop_down)))
+                  child: Icon(
+                       (notifButton
+                          ?  CupertinoIcons.arrow_up_circle
+                          :  CupertinoIcons.arrow_down_circle)))
             ],
           ),
           if (notifButton) notifParameter(),
@@ -455,19 +460,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           Row(
             children: [
-              iconImage(Icons.theater_comedy),
+              iconImage(Icons.theater_comedy_outlined),
               const Expanded(flex: 6, child: Text("Theme")),
               Expanded(
                   flex: 1,
-                  child: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          themeButton = !themeButton;
-                        });
-                      },
-                      icon: themeButton
-                          ? const Icon(Icons.arrow_drop_up)
-                          : const Icon(Icons.arrow_drop_down)))
+                  child: Icon(
+                       (themeButton
+                          ?  CupertinoIcons.arrow_up_circle
+                          :  CupertinoIcons.arrow_down_circle)))
             ],
           ),
           if (themeButton) themeDataParameter()
@@ -502,23 +502,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget aboutus() {
     return GestureDetector(
       onTap: () {
-        showDialog(
-            context: context,
-            builder: (_) => AlertDialog(
-                  title: const Text("about us"),
-                  actions: [
-                    ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text("OK"))
-                  ],
-                ));
+        Navigator.push(context, MaterialPageRoute(builder: (context) =>const AboutUsScreen()));
       },
       child: Column(
         children: [
           Row(children: [
-            iconImage(Icons.info),
+            iconImage(CupertinoIcons.info),
             const Expanded(
                 flex: 6,
                 child: Text(
@@ -554,7 +543,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget lougoutItem() {
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
+        final SharedPreferences pref = await SharedPreferences.getInstance();
+        pref.setString('user', '');
+
+        // ignore: use_build_context_synchronously
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => const WelcomeScreen()),

@@ -4,7 +4,7 @@ import 'dart:developer';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_tflite/flutter_tflite.dart';
 
-class ScanController extends GetxController {
+class CameraControler extends GetxController {
   //camera
   late CameraController cameraController;
   late List<CameraDescription> cameras;

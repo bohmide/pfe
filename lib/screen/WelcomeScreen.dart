@@ -64,13 +64,13 @@ class WelcomeScreen extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        buttonNavigation(context, 1,() {
+        buttonNavigation(context, 1, () {
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => const SignUpScreen()));
         }, 'INSCRIT', 14, hieghtButton, wiedthButton, MyColors.primaryColor,
             MyColors.secondarytextColor),
-        // button inscrit    
-        buttonNavigation(context, 2,() {
+        // button inscrit
+        buttonNavigation(context, 2, () {
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => const SignInScreen()));
         },

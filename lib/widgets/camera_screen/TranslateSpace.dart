@@ -1,9 +1,12 @@
 // ignore_for_file: file_names
 
+import 'dart:developer';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 //import 'package:flutter_tts/flutter_tts.dart';
 import 'package:hand_tracking/contant/MyColors.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 import 'package:hand_tracking/utils/Size.dart';
 
 class TranslateSpace extends StatefulWidget {
@@ -14,12 +17,14 @@ class TranslateSpace extends StatefulWidget {
 }
 
 class _TranslateSpaceState extends State<TranslateSpace> {
-
   List<String> messages = [
-    "test",
-    "salut",
-    "bonjour",
-    "kjgsdbfgbdsoihghfsdlkvgnskljdh fglkjvsfkjlghkvsljdnhklgnlkdfhgqljkhkjghcqlkjhg lkjhdgvh"
+    "Ahmed",
+    "Bousnina",
+    "Ahmedbousnina",
+    "Ahmedbousnina",
+    "Ahmedbousnina",
+    "Ahmedbousnina",
+    ""
   ];
 
   /*Future<void> _speak(String text) async {
@@ -31,7 +36,6 @@ class _TranslateSpaceState extends State<TranslateSpace> {
     log("Error while speaking: $e");
   }
 }*/
-
 
   /*FlutterTts _flutterTts = FlutterTts();
 
@@ -124,7 +128,7 @@ class _TranslateSpaceState extends State<TranslateSpace> {
                 decoration: TextDecoration.none),
             overflow: TextOverflow.clip,
           ),
-          Align(
+          /*Align(
             alignment: Alignment.centerRight,
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -136,9 +140,10 @@ class _TranslateSpaceState extends State<TranslateSpace> {
                   child: PopupMenuButton(
                     padding: EdgeInsets.zero,
                     itemBuilder: (ctx) => [
-                      _buildPopupMenuItem('Search', Icons.search),
-                      _buildPopupMenuItem('traduit', Icons.translate),
-                      _buildPopupMenuItem('Copy', Icons.copy),
+                      _buildPopupMenuItem(
+                          'Search', CupertinoIcons.search, message),
+                      _buildPopupMenuItem('traduit', Icons.translate, message),
+                      _buildPopupMenuItem('Copy', Icons.copy, message),
                     ],
                   ),
                 ),
@@ -150,24 +155,41 @@ class _TranslateSpaceState extends State<TranslateSpace> {
                         color: Colors.black,
                         padding: EdgeInsets.zero,
                         onPressed: () async {
-                        //  _flutterTts.speak('Hello, world! This is a text-to-speech example.');
                         },
                         icon: const Icon(Icons.volume_up))),
               ],
             ),
-          )
+          )*/
         ],
       ),
     );
   }
 
-  PopupMenuItem _buildPopupMenuItem(String title, IconData iconData) {
+  void _launchGoogleSearch() async {
+    String query = 'facebook';
+    String url = 'https://www.google.com/search?q=$query';
+
+    log("lunch ...");
+    // Check if the Google app is installed, if not, launch the browser
+    if (await canLaunchUrl(Uri.parse('google://'))) {
+      await launch('google://www.google.com/search?q=$query');
+    } else if (await canLaunchUrl(Uri.parse(url))) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  PopupMenuItem _buildPopupMenuItem(
+      String title, IconData iconData, String message) {
     return PopupMenuItem(
       child: Row(
         children: [
           IconButton(
             padding: EdgeInsets.zero,
-            onPressed: () {},
+            onPressed: () async {
+              _launchGoogleSearch();
+            },
             icon: Icon(iconData),
             color: Colors.black,
           ),

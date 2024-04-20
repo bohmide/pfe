@@ -1,4 +1,4 @@
-// ignore_for_file: file_names
+// ignore_for_file: file_names, use_build_context_synchronously
 
 import 'dart:convert';
 import 'dart:developer';
@@ -55,9 +55,11 @@ class _SignInScreenState extends State<SignInScreen> {
                   ),
                   MyTextField("password", 1, "pwd",
                       textEditingController: _controllerPassword),
-                  if (_pwdError)
-                    if (_pwdError) textErrorWidget(_pwdErrorText),
+                  if (_pwdError) textErrorWidget(_pwdErrorText),
                   forgotPswdText(),
+                  /*const SizedBox(
+                    height: 14,
+                  ),*/
                   signInButton(),
                 ],
               ),
@@ -65,15 +67,18 @@ class _SignInScreenState extends State<SignInScreen> {
             const SizedBox(
               height: 64,
             ),
-            otherMethodeText(),
+            /*otherMethodeText(),
             const SizedBox(
               height: 32,
             ),
-            otherMethodeButton(),
+            otherMethodeButton(),*/
             const SizedBox(
               height: 64,
             ),
-            signUpText()
+            signUpText(),
+            SizedBox(
+              height: getHeight(context) / 5,
+            ),
           ],
         ),
       ),
@@ -115,46 +120,81 @@ class _SignInScreenState extends State<SignInScreen> {
         _pwdErrorText = "";
       }
     });
-    return _pwdError || _emailError;
+    return _pwdError && _emailError;
   }
 
   Widget signInButton() {
     return buttonNavigation2(context, 0, _isloadin, () async {
-      if (!verif()) {
-        //viewRequest();
-        http.Response response =
-            await loginRequest(_controllerEmail.text, _controllerPassword.text);
+      setState(() {
+        _isloadin = true;
+      });
 
-        final body = jsonDecode(response.body);
+      int serverStat = await checkSever();
 
-        if (response.body.contains("email")) {
-          _emailError = true;
-          setState(() {
-            _isloadin = false;
-          });
-          _emailErrorText = body["detail"].toString();
-        } else if (response.body.contains("password")) {
-          setState(() {
-            _isloadin = false;
-          });
-          _pwdError = true;
-          _pwdErrorText = body["detail"].toString();
-        }
-        if (response.statusCode == 200) {
-          await availableCameras().then((value) {
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => CameraScreen()),
-                (route) => false);
+      if (serverStat == 1) {
+        setState(() {
+          _isloadin = false;
+        });
+        showDialog(
+            context: context,
+            builder: (_) {
+              return AlertDialog(
+                title: const Text("Check Server"),
+                actions: [
+                  buttonNavigation2(
+                      context,
+                      0,
+                      false,
+                      () => Navigator.pop(context),
+                      "ok",
+                      16.0,
+                      32.0,
+                      64.0,
+                      MyColors.primaryColor,
+                      Colors.white)
+                ],
+              );
+            });
+      } else {
+        if (!verif()) {
+          http.Response response = await loginRequest(
+              _controllerEmail.text, _controllerPassword.text);
+
+          final body = jsonDecode(response.body);
+
+          if (response.statusCode == 200) {
+            await availableCameras().then((value) {
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const CameraScreen()),
+                  (route) => false);
+            });
+
             setState(() {
               _isloadin = false;
             });
-          });
-        } else {
-          log(jsonDecode(response.body));
+          } else if (response.body.contains("email")) {
+            setState(() {
+              _isloadin = false;
+            });
+            _emailErrorText = body["detail"].toString();
+            _emailError = true;
+          } else if (response.body.contains("password")) {
+            setState(() {
+              _isloadin = false;
+            });
+            _pwdErrorText = body["detail"].toString();
+            _pwdError = true;
+          } else {
+            log(jsonDecode(response.body));
+            setState(() {
+              _isloadin = false;
+            });
+          }
+        }else{
           setState(() {
-            _isloadin = false;
-          });
+        _isloadin = false;
+      });
         }
       }
     }, "Sign In", 14, getHeight(context) / 15, null, MyColors.primaryColor,

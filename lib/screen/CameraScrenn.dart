@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:hand_tracking/contant/MyColors.dart';
-import 'package:hand_tracking/screen/ScanController.dart';
+import 'package:hand_tracking/controller/CameraControler.dart';
 import 'package:hand_tracking/utils/Size.dart';
 import 'package:hand_tracking/widgets/camera_screen/AvatarSpace.dart';
 import 'package:hand_tracking/widgets/camera_screen/TranslateSpace.dart';
@@ -31,8 +31,8 @@ class _CameraScreenState extends State<CameraScreen> {
         SizedBox(
           width: getWidth(context),
           height: getHeight(context),
-          child: GetBuilder<ScanController>(
-            init: ScanController(),
+          child: GetBuilder<CameraControler>(
+            init: CameraControler(),
             builder: (controller) {
               if (listObject.isEmpty) {
                 listObject.add(controller.label);

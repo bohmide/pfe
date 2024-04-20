@@ -2,11 +2,21 @@
 
 const String server = 'http://10.0.2.2:8000';
 //
+const String serverPath = '$server/server/';
 const String userAuth = '$server/user';
+
 const String register = '$userAuth/register/';
+const String userReset = '$server/reset';
+
+
 const String login = '$userAuth/login/';
+const String logout = '$userAuth/logout/';
+
 const String view = '$userAuth/view/';
 const String change_name = '$userAuth/change_name/';
-const String verif_pwd = '$userAuth/verif_pwd/';
 const String chnage_pwd = '$userAuth/change_pwd/';
-const String logout = '$userAuth/logout/';
+
+const String resetSendMail = '$userReset/send_email/';
+const String resetPassword = '$userReset/reset_password/';
+const String verifCode = '$userReset/verif_code/';
+
