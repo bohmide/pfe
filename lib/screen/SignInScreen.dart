@@ -43,6 +43,9 @@ class _SignInScreenState extends State<SignInScreen> {
         child: Column(
           children: [
             logo(),
+            const SizedBox(
+              height: 64,
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 44),
               child: Column(
@@ -57,21 +60,10 @@ class _SignInScreenState extends State<SignInScreen> {
                       textEditingController: _controllerPassword),
                   if (_pwdError) textErrorWidget(_pwdErrorText),
                   forgotPswdText(),
-                  /*const SizedBox(
-                    height: 14,
-                  ),*/
                   signInButton(),
                 ],
               ),
             ),
-            const SizedBox(
-              height: 64,
-            ),
-            /*otherMethodeText(),
-            const SizedBox(
-              height: 32,
-            ),
-            otherMethodeButton(),*/
             const SizedBox(
               height: 64,
             ),
@@ -87,17 +79,10 @@ class _SignInScreenState extends State<SignInScreen> {
 
   Widget logo() {
     return SizedBox(
-      height: getHeight(context) * 0.3,
-      width: double.infinity,
-      child: const Center(
-        child: Text(
-          "LOGO",
-          style: TextStyle(
-              fontFamily: "inter",
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: MyColors.primarytextColor),
-        ),
+      width: getWidth(context) / 1.5,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 32),
+        child: Center(child: SvgPicture.asset('assets/logos/logo2.svg')),
       ),
     );
   }
@@ -191,10 +176,10 @@ class _SignInScreenState extends State<SignInScreen> {
               _isloadin = false;
             });
           }
-        }else{
+        } else {
           setState(() {
-        _isloadin = false;
-      });
+            _isloadin = false;
+          });
         }
       }
     }, "Sign In", 14, getHeight(context) / 15, null, MyColors.primaryColor,

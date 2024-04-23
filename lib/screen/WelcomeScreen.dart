@@ -38,11 +38,7 @@ class WelcomeScreen extends StatelessWidget {
       decoration: const BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(24)),
           color: MyColors.primaryColor),
-      child: Image.asset(
-        "assets/avatar/peace.png",
-        errorBuilder: (context, error, stackTrace) => // when error
-            Image.asset("assets/avatar/man_3.png"),
-      ),
+      child: Image.asset("assets/avatar/peace.png"),
     );
   }
 
@@ -67,9 +63,8 @@ class WelcomeScreen extends StatelessWidget {
         buttonNavigation(context, 1, () {
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => const SignUpScreen()));
-        }, 'INSCRIT', 14, hieghtButton, wiedthButton, MyColors.primaryColor,
+        }, 'SIGN UP', 14, hieghtButton, wiedthButton, MyColors.primaryColor,
             MyColors.secondarytextColor),
-        // button inscrit
         buttonNavigation(context, 2, () {
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => const SignInScreen()));

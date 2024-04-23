@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -36,10 +37,9 @@ Future<User?> getUser() async {
     if (userDataString != null) {
       return User.fromJson(jsonDecode(userDataString));
     }
-    return null; // Return null if user data is not found
+    return null ;
   } catch (e) {
-    // Handle any errors that occur during fetching user data
-    print('Error getting user data from SharedPreferences: $e');
+    log('Error getting user data from SharedPreferences: $e');
     return null; // Return null if an error occurs
   }
 }

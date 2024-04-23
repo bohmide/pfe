@@ -53,6 +53,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               logo(),
+              const SizedBox(
+                height: 32,
+              ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 44),
                 child: Column(
@@ -85,7 +88,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     const SizedBox(
                       height: 14,
                     ),
-                    //verif password
                     MyTextField("verif password", 1, "pwd",
                         textEditingController: _controllerVerifPassword),
                     if (_verifPwdError) textErrorWidget(_verifPwdErrorText),
@@ -98,14 +100,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
               const SizedBox(
                 height: 64,
-              ),
-              /*otherMethodeText(),
-              const SizedBox(
-                height: 32,
-              ),
-              otherMethodeButton(),*/
-              const SizedBox(
-                height: 32,
               ),
               signInText(),
               SizedBox(
@@ -120,18 +114,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Widget logo() {
     return SizedBox(
-      height: getHeight(context) / 3,
       width: getWidth(context)/1.5,
-      child: Center(
-        child:
-          Padding(
-            padding: const EdgeInsets.only(
-              top : 32,
-              bottom: 16,
-            ),
-            child: SvgPicture.asset('assets/logos/logo.svg'),
-          )
-
+      child: Padding(
+        padding: const EdgeInsets.only(top:32),
+        child: Center(
+          child:
+            SvgPicture.asset('assets/logos/logo2.svg')
+        
+        ),
       ),
     );
   }

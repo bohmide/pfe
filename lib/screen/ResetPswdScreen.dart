@@ -24,7 +24,7 @@ class _ResetPswdScreenState extends State<ResetPswdScreen> {
 
   String emailErrorText = "Email is empty";
   String codeErrorText = "code is empty";
-  String PaswwordErrorText = "Paswword is empty";
+  String paswwordErrorText = "Paswword is empty";
   String rePaswwordErrorText = "rePaswword is empty";
 
   bool emailError = false;
@@ -191,7 +191,7 @@ class _ResetPswdScreenState extends State<ResetPswdScreen> {
       children: [
         MyTextField(
             "password", 1, textEditingController: _controllerPassword, "pwd"),
-        if (paswwordError) textErrorWidget(PaswwordErrorText),
+        if (paswwordError) textErrorWidget(paswwordErrorText),
         const SizedBox(
           height: 16,
         ),
@@ -226,7 +226,7 @@ class _ResetPswdScreenState extends State<ResetPswdScreen> {
       } else if (response == 1) {
         setState(() {
           paswwordError = true;
-          PaswwordErrorText = "password must be >8";
+          paswwordErrorText = "password must be >8";
         });
       } else if (response == 2) {
         setState(() {
