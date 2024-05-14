@@ -1,6 +1,6 @@
 // ignore_for_file: constant_identifier_names
 
-const String server = 'http://10.0.2.2:8000';
+const String server = 'http://192.168.1.68:8000/';
 //
 const String serverPath = '$server/server/';
 const String userAuth = '$server/user';
@@ -19,4 +19,6 @@ const String chnage_pwd = '$userAuth/change_pwd/';
 const String resetSendMail = '$userReset/send_email/';
 const String resetPassword = '$userReset/reset_password/';
 const String verifCode = '$userReset/verif_code/';
+
+const String modelPridect = '$server/predict/';
 

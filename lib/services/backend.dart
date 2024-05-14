@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:hand_tracking/contant/urls.dart';
 import 'package:hand_tracking/model/User.dart';
 import 'package:http/http.dart' as http;
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../contant/urls.dart' as urls;
@@ -151,7 +152,7 @@ Future<int> changeNameRequest(String first_name, String last_name) async {
   return 1;
 }
 
-Future<int> changePwdRequest(String new_password) async {
+Future<int> changePwdRequest(String new_password, String old_password) async {
   final SharedPreferences pref = await SharedPreferences.getInstance();
   var token = pref.getString('token');
 
@@ -162,6 +163,7 @@ Future<int> changePwdRequest(String new_password) async {
       'Authorization': 'Bearer $token',
     }, body: <String, String>{
       "new_password": new_password,
+      "old_password":old_password
     });
     if (response.statusCode == 200) {
       return 0;
@@ -261,4 +263,33 @@ Future<void> logoutRequest() async {
   } catch (e) {
     log('$e');
   }
+}
+
+
+
+Future<String?> sendImageToBackend(String imagePath) async {
+
+  final SharedPreferences pref = await SharedPreferences.getInstance();
+  String? dataUser = pref.getString("user");
+
+  if(dataUser!=null){
+    User user = User.fromJson(jsonDecode(dataUser));
+    var request = http.MultipartRequest('POST', Uri.parse(urls.modelPridect));
+    request.files.add(await http.MultipartFile.fromPath('image', imagePath));
+    Map<String, dynamic> payload= JwtDecoder.decode(user.token);
+    request.fields['id_user'] = payload['id'].toString();
+  
+    var response = await request.send();
+    if (response.statusCode == 200) {
+      log('Image uploaded');
+      var responseBody = await response.stream.bytesToString();
+      var jsonResponse = json.decode(responseBody);
+      var prediction = jsonResponse['prediction'];
+      return prediction;
+      //File(imagePath).delete().then((_)=> log("image deleted"));
+    } else if (response.statusCode == 204) {
+      return '1';
+    }
+  }
+  return null;
 }

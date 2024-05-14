@@ -1,5 +1,9 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:camera/camera.dart';
 import 'package:get/get.dart';
+import 'package:hand_tracking/services/backend.dart';
 import 'dart:developer';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_tflite/flutter_tflite.dart';
@@ -10,17 +14,20 @@ class CameraControler extends GetxController {
   late List<CameraDescription> cameras;
 
   bool _isProces = false;
+  bool islive = false;
   var isCameraInitialized = false.obs;
 
   int cameraCount = 0;
-
+  String? responce;
   String label = "";
+
+  List<String> thelist = [];
 
   @override
   void onInit() {
     super.onInit();
-    initCamera();
     //initTFLite();
+    initCamera(0);
   }
 
   void initTFLite() async {
@@ -38,25 +45,37 @@ class CameraControler extends GetxController {
     log("model loaded");
   }
 
-  Future initCamera() async {
+  Future initCamera(index) async {
     if (await Permission.camera.request().isGranted) {
       cameras = await availableCameras();
-      cameraController = CameraController(cameras[0], ResolutionPreset.max);
+      cameraController = CameraController(cameras[index], ResolutionPreset.max);
       try {
-        await cameraController.initialize().then((value) {
-          cameraController.startImageStream((image) {
-            cameraCount++;
-            if (cameraCount % 10 == 0) {
-              cameraCount = 0;
-              //log("object...");
-              //objectDetector(image);
-              //log("object detected.");
+        log(islive.toString());
+          await cameraController.initialize();
+            log("start..");
+            Timer.periodic(const Duration(seconds: 1), (timer) async {
+            XFile image = await cameraController.takePicture();
+            await sendImageToBackend(image.path).then((responce) {
+              log("send");
+              if(responce != null){
+                if(responce == "1"){
+                  log('no hand detected');
+                }else{
+                  thelist.add("predection: $responce");
+                  update();
+                }
+            }else{
+              log('user not found');
             }
-            update();
+            } );
+            
+
+            File(image.path).delete().then((_)=> log("image deleted"));
           });
-        });
-        isCameraInitialized(true);
-        update();
+          
+          isCameraInitialized(true);
+          update();
+        
       } on CameraException catch (e) {
         log("camera error $e");
       }
@@ -66,7 +85,7 @@ class CameraControler extends GetxController {
   }
 
   void objectDetector(CameraImage cameraImage) async {
-    //log("process:  $_isProces");
+    log("process:  $_isProces");
     if (!_isProces) {
       _isProces = true;
       var object = await Tflite.runModelOnFrame(
@@ -90,6 +109,9 @@ class CameraControler extends GetxController {
         var objectDetected = object.first;
         if (objectDetected["confidence"] * 100 > 45) {
           label = objectDetected["label"];
+          log(label);
+        } else {
+          log(" <45 ");
         }
       } else {
         log("nothing.. ");

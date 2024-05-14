@@ -4,7 +4,7 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:hand_tracking/model/User.dart';
 import 'package:hand_tracking/screen/AboutUsScreen.dart';
-import 'package:hand_tracking/widgets/comun/topAppBar.dart';
+import 'package:hand_tracking/screen/CameraScrenn.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_advanced_switch/flutter_advanced_switch.dart';
@@ -101,6 +101,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
     ));
+  }
+
+  Widget topAppbar(context) {
+    return SizedBox(
+      height: 64,
+      width: getWidth(context),
+      child: Align(
+          alignment: Alignment.centerLeft,
+          child: IconButton(
+              onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: ((context) => const 
+              CameraScreen()))),
+              icon: const Icon(Icons.arrow_back_ios))),
+    );
   }
 
 
@@ -371,7 +384,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: buttonSubmit("OK", () async {
                 if (verifPwd()) {
                   int statueRequest =
-                      await changePwdRequest(_controllerPassword.text);
+                      await changePwdRequest(_controllerPassword.text, _controllerNewPassword.text);
                   log("with statue: ${statueRequest.toString()}");
                 }
               }))

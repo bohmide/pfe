@@ -10,15 +10,15 @@ class AvatarSpace extends StatelessWidget {
     return Align(
       alignment: Alignment.topLeft,
       child: Container(
-        height: 32,
-        width: 32,
+        height: 42,
+        width: 42,
         decoration: BoxDecoration(
             color: MyColors.spacesBackground,
             borderRadius: const BorderRadius.all(Radius.circular(8))),
         child: IconButton(
             color: MyColors.primaryIconColor,
             padding: const EdgeInsets.all(0),
-            onPressed: () => Navigator.push(context, MaterialPageRoute(
+            onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(
                     builder: (context) => const SettingsScreen())),
            
             icon: const Icon(Icons.account_circle)),
