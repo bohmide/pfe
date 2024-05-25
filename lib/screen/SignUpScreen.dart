@@ -175,6 +175,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   MaterialPageRoute(builder: (context) => const CameraScreen()),
                   (route) => false);
             } else {
+              setState(() {
+                _isloading = false;
+              });
               var body = jsonDecode(value.body);
               if (body.toString().contains('email')) {
                 setState(() {
@@ -186,9 +189,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
               }
             }
           }).onError((error, stackTrace) {
+            setState(() {
+                _isloading = false;
+              });
             log(('Error: ${error.toString()}'));
           });
         }
+        setState(() {
+          _isloading = false;
+        });
       }
     }, 'Sign Up', 14, getHeight(context) / 15, null, MyColors.primaryColor,
         MyColors.secondarytextColor);

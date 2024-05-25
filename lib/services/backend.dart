@@ -289,6 +289,8 @@ Future<String?> sendImageToBackend(String imagePath) async {
       //File(imagePath).delete().then((_)=> log("image deleted"));
     } else if (response.statusCode == 204) {
       return '1';
+    }else {
+      return '-1';
     }
   }
   return null;

@@ -1,6 +1,6 @@
 // ignore_for_file: constant_identifier_names
 
-const String server = 'http://192.168.1.68:8000/';
+const String server = 'http://192.168.137.77:8000/';
 //
 const String serverPath = '$server/server/';
 const String userAuth = '$server/user';

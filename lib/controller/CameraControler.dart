@@ -53,7 +53,7 @@ class CameraControler extends GetxController {
         log(islive.toString());
           await cameraController.initialize();
             log("start..");
-            Timer.periodic(const Duration(seconds: 1), (timer) async {
+            Timer.periodic(const Duration(microseconds: 1500), (timer) async {
             XFile image = await cameraController.takePicture();
             await sendImageToBackend(image.path).then((responce) {
               log("send");
@@ -61,7 +61,7 @@ class CameraControler extends GetxController {
                 if(responce == "1"){
                   log('no hand detected');
                 }else{
-                  thelist.add("predection: $responce");
+                  thelist.add(responce);
                   update();
                 }
             }else{

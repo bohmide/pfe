@@ -19,7 +19,7 @@ void main() async {
 
   if (user == null) {
     runApp(const Start(
-      widgetStart: WelcomeScreen(),
+      widgetStart:CameraScreen(),// WelcomeScreen(),
     ));
     DependencyInjection.init();
   } else {

@@ -26,12 +26,13 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
 
   List<String> listObject = [""];
   List<String> messages = [
-    "Ahmed",
-    "Bousnina",
-    "Ahmedbousnina",
-    "Ahmedbousnina",
-    "Ahmedbousnina",
-    "Ahmedbousnina",
+    "O",
+    "V",
+    "I",
+    "C",
+    "B",
+    "Space",
+    "A"
 
   ];
 
@@ -45,8 +46,8 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
   @override
   void dispose() {
     // TODO: implement dispose
+    
     super.dispose();
-  super.dispose();
   }
 
   @override
@@ -55,12 +56,12 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
     super.didChangeAppLifecycleState(state);
 
     if (state == AppLifecycleState.paused) {
-      cameraController.cameraController.stopImageStream();
-      _isTheRearCameraSelected = true;
+      cameraController.dispose();
     } else if (state == AppLifecycleState.resumed) {
       cameraController.initCamera(_isTheRearCameraSelected ? 0 : 1);
 
     }
+
   }
 
 
@@ -82,8 +83,7 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
                   ? Stack(
                       children: [
                         SizedBox(
-                          height: getHeight(context),
-                          width: getWidth(context),
+            
                           child: CameraPreview(controller.cameraController)),
                         translateSpace(controller.thelist)
                       ],
@@ -114,11 +114,11 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
       child: Container(
         decoration: BoxDecoration(
             color: MyColors.spacesBackground,
-            borderRadius: const BorderRadius.all(Radius.circular(8))),
+            borderRadius: const BorderRadius.all(Radius.circular(25))),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            GestureDetector(
+            /*GestureDetector(
                 onTap: () {
                   setState(() {
                     _isLive = !_isLive;
@@ -132,7 +132,7 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
                   ? Image.asset("assets/images/live.png", color: Colors.white,)
                   : Image.asset("assets/images/no_live.png", color: Colors.white,)
                   ),  
-              ),
+              ),*/
 
             IconButton(
                 color: MyColors.primaryIconColor,
@@ -170,14 +170,18 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
           width: getWidth(context),
           decoration: BoxDecoration(
               color: MyColors.spacesBackground,
-              borderRadius: const BorderRadius.all(Radius.circular(8))),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(25),
+                topRight: Radius.circular(25)
+              )),
           child: SingleChildScrollView(
             child:Column(
+              verticalDirection: VerticalDirection.up,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: List.generate(
-                pridections.length,
+                messages.length,
                 (index) {
-                  return textSpace(context, pridections[index]);
+                  return textSpace(context, messages[index]);
                 },
               ),
               )
